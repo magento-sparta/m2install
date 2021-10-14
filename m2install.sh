@@ -1894,14 +1894,14 @@ function gitClone()
     validateGitRepository "${GIT_CE_REPO}" "${MAGENTO_VERSION}"
     validateGitRepository "${GIT_EE_REPO}" "${MAGENTO_VERSION}"
 
-    CMD="${BIN_GIT} clone --branch $MAGENTO_VERSION $GIT_CE_REPO ."
+    CMD="${BIN_GIT} clone --branch $MAGENTO_VERSION --single-branch $GIT_CE_REPO ."
     runCommand
     CMD="${BIN_GIT} config remote.origin.fetch \"+refs/heads/*:refs/remotes/origin/*\""
     runCommand
 
     if [[ "$GIT_EE_REPO" ]] && [[ "$INSTALL_EE" ]]
     then
-        CMD="${BIN_GIT} clone --branch $MAGENTO_VERSION $GIT_EE_REPO $EE_PATH"
+        CMD="${BIN_GIT} clone --branch $MAGENTO_VERSION --single-branch $GIT_EE_REPO $EE_PATH"
         runCommand
 	CMD="cd $EE_PATH; ${BIN_GIT} config remote.origin.fetch \"+refs/heads/*:refs/remotes/origin/*\"; cd -"
     	runCommand
