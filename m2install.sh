@@ -1281,7 +1281,13 @@ function overwriteOriginalFiles()
         CMD="mv .htaccess .htaccess.merchant"
         runCommand
     fi
-    CMD="curl -s -o .htaccess https://raw.githubusercontent.com/magento/magento2/${MAGENTO_VERSION}/.htaccess"
+    HTACCESS_VERSION=$MAGENTO_VERSION
+    MAGENTO_VS="2.4.3-p2"
+    if versionIsHigherThan "MAGENTO_VS" "2.4.1"
+    then
+      HTACCESS_VERSION="2.4.1"
+    fi
+    CMD="curl -s -o .htaccess https://raw.githubusercontent.com/magento/magento2/${HTACCESS_VERSION}/.htaccess"
     runCommand
 
     if [ -f pub/.htaccess ] && [ ! -f pub/.htaccess.merchant ]
@@ -1289,7 +1295,7 @@ function overwriteOriginalFiles()
         CMD="mv pub/.htaccess pub/.htaccess.merchant"
         runCommand
     fi
-    CMD="curl -s -o pub/.htaccess https://raw.githubusercontent.com/magento/magento2/${MAGENTO_VERSION}/pub/.htaccess"
+    CMD="curl -s -o pub/.htaccess https://raw.githubusercontent.com/magento/magento2/${HTACCESS_VERSION}/pub/.htaccess"
     runCommand
 
     if [ -f pub/static/.htaccess ] && [ ! -f pub/static/.htaccess.merchant ]
@@ -1297,7 +1303,7 @@ function overwriteOriginalFiles()
         CMD="mv pub/static/.htaccess pub/static/.htaccess.merchant"
         runCommand
     fi
-    CMD="curl -s -o pub/static/.htaccess https://raw.githubusercontent.com/magento/magento2/${MAGENTO_VERSION}/pub/static/.htaccess"
+    CMD="curl -s -o pub/static/.htaccess https://raw.githubusercontent.com/magento/magento2/${HTACCESS_VERSION}/pub/static/.htaccess"
     runCommand
 
     if [ -f pub/media/.htaccess ] && [ ! -f pub/media/.htaccess.merchant ]
@@ -1305,8 +1311,16 @@ function overwriteOriginalFiles()
         CMD="mv pub/media/.htaccess pub/media/.htaccess.merchant"
         runCommand
     fi
-    CMD="curl -s -o pub/media/.htaccess https://raw.githubusercontent.com/magento/magento2/${MAGENTO_VERSION}/pub/media/.htaccess"
+    CMD="curl -s -o pub/media/.htaccess https://raw.githubusercontent.com/magento/magento2/${HTACCESS_VERSION}/pub/media/.htaccess"
     runCommand
+
+    if versionIsHigherThan "$(getMagentoVersion)" "2.4.2"
+    then
+      CMD="sed -i '/RewriteRule\ .*\ \/pub\/\$0 \[L\]/d' .htaccess"
+      runCommand
+      CMD="cp pub/index.php index.php && sed -i 's/\/..\/app\/bootstrap.php/\/app\/bootstrap.php/g' index.php"
+      runCommand
+    fi
 
     if [ ! "$(getRequest skipPostOverwrite)" ]
     then
