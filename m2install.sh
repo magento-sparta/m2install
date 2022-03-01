@@ -1308,14 +1308,6 @@ function overwriteOriginalFiles()
     CMD="curl -s -o pub/media/.htaccess https://raw.githubusercontent.com/magento/magento2/${MAGENTO_VERSION}/pub/media/.htaccess"
     runCommand
 
-    if versionIsHigherThan "$(getMagentoVersion)" "2.4.2"
-    then
-      CMD="sed -i '/RewriteRule\ .*\ \/pub\/\$0 \[L\]/d' .htaccess"
-      runCommand
-      CMD="cp pub/index.php index.php && sed -i 's/\/..\/app\/bootstrap.php/\/app\/bootstrap.php/g' index.php"
-      runCommand
-    fi
-
     if [ ! "$(getRequest skipPostOverwrite)" ]
     then
         postOverwriteOriginalFiles
@@ -2156,6 +2148,13 @@ function afterInstall()
     then
         appConfigImport
     fi
+    if versionIsHigherThan "$(getMagentoVersion)" "2.4.2"
+    then
+      CMD="sed -i '/RewriteRule\ .*\ \/pub\/\$0 \[L\]/d' .htaccess"
+      runCommand
+      CMD="cp pub/index.php index.php && sed -i 's/\/..\/app\/bootstrap.php/\/app\/bootstrap.php/g' index.php"
+      runCommand
+    fi
     warmCache
 }
 
@@ -2697,6 +2696,7 @@ function main()
     else
         magentoInstallAction;
     fi
+
     addStep "afterInstall"
     executeSteps "${STEPS[@]}"
 
