@@ -1281,6 +1281,7 @@ function overwriteOriginalFiles()
         CMD="mv .htaccess .htaccess.merchant"
         runCommand
     fi
+    CMD="curl -s -o .htaccess https://raw.githubusercontent.com/magento/magento2/${MAGENTO_VERSION}/.htaccess"
     runCommand
 
     if [ -f pub/.htaccess ] && [ ! -f pub/.htaccess.merchant ]
