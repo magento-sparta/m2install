@@ -2476,7 +2476,6 @@ function processOptions()
         shift
     done
 }
-
 function cleanupCurrentDirectory()
 {
   local currentDirectory="$(pwd)"
@@ -2488,12 +2487,12 @@ function cleanupCurrentDirectory()
   fi
   if [ "$(ls -A)" ] && askConfirmation "Current directory is not empty. Do you want to clean current Directory (y/N)";
   then
-    if askConfirmation "Do you want to delete dump files? (y/N)";
+    if askConfirmation "Do you want to keep dump files, ex: php*.code.tar.gz ? (y/N)";
     then
-      CMD="ls -A | xargs rm -rf"
+      CMD="ls -I 'php*.*.*gz' -A | xargs rm -rf"
       runCommand
     else
-      CMD="ls -I 'php*.*.*gz' -A | xargs rm -rf"
+      CMD="ls -A | xargs rm -rf"
       runCommand
     fi
   fi
