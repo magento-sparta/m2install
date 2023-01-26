@@ -57,6 +57,7 @@ GIT_B2B_PATH=magento2b2b
 SOURCE=
 FORCE=
 MAGE_MODE=dev
+DELETE_DUMPS=
 
 BIN_PHP=${BIN_PHP:"php"}
 BIN_MAGE="-d memory_limit=4G bin/magento"
@@ -2408,6 +2409,9 @@ function processOptions()
                 FORCE=1
                 USE_WIZARD=0
             ;;
+            --delete-dumps)
+                DELETE_DUMPS=1
+            ;;
             --websites)
               generateWebsites
               exit 0;
@@ -2480,6 +2484,7 @@ function cleanupCurrentDirectory()
 {
   local currentDirectory="$(pwd)"
   local homeDirectory="$(cd ~; pwd)"
+  local removeAll="ls -A | xargs rm -rf"
   if [[ "$currentDirectory" == "$homeDirectory" ]]
   then
     printError "Current Directory is home ($currentDirectory)"
@@ -2487,16 +2492,32 @@ function cleanupCurrentDirectory()
   fi
   if [ "$(ls -A)" ] && askConfirmation "Current directory is not empty. Do you want to clean current Directory (y/N)";
   then
-    if askConfirmation "Do you want to keep dump files, ex: php*.code.tar.gz ? (y/N)";
+    if [[ "$DELETE_DUMPS" ]];
+    then
+      CMD="$removeAll"
+      runCommand
+    elif askConfirmation "Do you want to keep dump files, ex: php*.code.tar.gz ? (y/N)";
     then
       CMD="ls -I 'php*.*.*gz' -A | xargs rm -rf"
       runCommand
     else
-      CMD="ls -A | xargs rm -rf"
+      CMD="$removeAll"
       runCommand
     fi
   fi
 }
+function versionIsHigherThan()
+{
+  local defaultVersion="2.4"
+  local mageVersion="$MAGENTO_VERSION"
+  [[ "$1" ]] && mageVersion="$1"
+  [[ "$2" ]] && defaultVersion="$2"
+  local esRequired=$(php -r "echo (version_compare('$mageVersion', '$defaultVersion') >= 0) ? 'REQUIRED' : 'NO';")
+  [[ "$esRequired" == "REQUIRED" ]] && return 0;
+  return 1;
+
+}
+
 function versionIsHigherThan()
 {
   local defaultVersion="2.4"
