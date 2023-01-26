@@ -2486,10 +2486,16 @@ function cleanupCurrentDirectory()
     printError "Current Directory is home ($currentDirectory)"
     exit 1;
   fi
-  if [ "$(ls -A)" ] && askConfirmation "Current directory is not empty. Do you want to clean current Directory (y/N)"
+  if [ "$(ls -A)" ] && askConfirmation "Current directory is not empty. Do you want to clean current Directory (y/N)";
   then
-    CMD="ls -A | xargs rm -rf"
-    runCommand
+    if askConfirmation "Do you want to delete dump files? (y/N)";
+    then
+      CMD="ls -A | xargs rm -rf"
+      runCommand
+    else
+      CMD="ls -I 'php*.*.*gz' -A | xargs rm -rf"
+      runCommand
+    fi
   fi
 }
 function versionIsHigherThan()
