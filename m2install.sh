@@ -2518,18 +2518,6 @@ function versionIsHigherThan()
 
 }
 
-function versionIsHigherThan()
-{
-  local defaultVersion="2.4"
-  local mageVersion="$MAGENTO_VERSION"
-  [[ "$1" ]] && mageVersion="$1"
-  [[ "$2" ]] && defaultVersion="$2"
-  local esRequired=$(php -r "echo (version_compare('$mageVersion', '$defaultVersion') >= 0) ? 'REQUIRED' : 'NO';")
-  [[ "$esRequired" == "REQUIRED" ]] && return 0;
-  return 1;
-
-}
-
 function validateElasticSearchIsAvailable()
 {
   [[ ! "$ELASTICSEARCH_HOST" ]] && ELASTICSEARCH_HOST="$(getESConfigHost $(getRecommendedSearchEngineForVersion))"
@@ -2848,4 +2836,3 @@ function main()
     printString "Pass: ${ADMIN_PASSWORD}"
 }
 main "${@}"
-
