@@ -59,7 +59,7 @@ FORCE=
 MAGE_MODE=dev
 DELETE_DUMPS=
 
-BIN_PHP=${BIN_PHP:"php"}
+BIN_PHP=php
 BIN_MAGE="-d memory_limit=4G bin/magento"
 BIN_COMPOSER=$(command -v composer)
 BIN_MYSQL="mysql"
