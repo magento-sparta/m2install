@@ -59,7 +59,7 @@ FORCE=
 MAGE_MODE=dev
 DELETE_DUMPS=
 
-BIN_PHP=${BIN_PHP:"php"}
+BIN_PHP=${BIN_PHP:-"php"}
 BIN_MAGE="-d memory_limit=4G bin/magento"
 BIN_COMPOSER=$(command -v composer)
 BIN_MYSQL="mysql"
@@ -1295,6 +1295,9 @@ function deletePaymentConfig()
   deleteConfig 'payment/payflow_advanced/pwd';
   deleteConfig 'payment/payflowpro/pwd';
   deleteConfig 'payment/payflow_link/pwd';
+  deleteConfig 'payment/payment_methods/sandbox_merchant_id';
+  deleteConfig 'payment/payment_methods/production_merchant_id';
+  deleteConfig 'payment/payment_methods/method';
 }
 
 function removeConfigByKeyword()
