@@ -2262,6 +2262,7 @@ function afterInstall()
 
 function disableTwoFactorAuthModules()
 {
+    disableModule 'Magento_AdminAdobeImsTwoFactorAuth'
     disableModule 'Magento_TwoFactorAuth'
     disableModule 'MarkShust_DisableTwoFactorAuth'
     disableModule 'WolfSellers_EnableDisableTfa'
