@@ -803,19 +803,27 @@ function restore_db()
     dropDB
     createNewDB
 
-    CMD="gunzip -cf \"$(getDbDumpFilename)\""
-    if which pv > /dev/null
-    then
-        CMD="pv \"$(getDbDumpFilename)\" | gunzip -cf";
+    local -r _DB_FILENAME=$(getDbDumpFilename)
+
+    if [[ "${_DB_FILENAME}" =~ "db_mydumper.sql.gz" ]]; then
+        hash myloader &>/dev/null || printError "'myloader' is not found on this system" || exit 1
+        CMD="gunzip -cf ${_DB_FILENAME} | myloader --host ${DB_HOST} --user ${DB_USER} --password ${DB_PASSWORD} --database ${DB_NAME} --overwrite-tables --stream"
+    else
+        CMD="gunzip -cf ${_DB_FILENAME}"
+        if which pv > /dev/null
+        then
+            CMD="pv ${_DB_FILENAME} | gunzip -cf";
+        fi
+
+        # Don't be confused by double gunzip in following command. Some poorly
+        # configured web servers can gzip everything including gzip files
+        CMD="${CMD} | gunzip -cf | sed -e 's/DEFINER[ ]*=[ ]*[^*]*\*/\*/'
+            | sed -e 's/TRIGGER[ ][\`][A-Za-z0-9_]*[\`][.]/TRIGGER /'
+            | sed -e 's/AFTER[ ]\(INSERT\)\{0,1\}\(UPDATE\)\{0,1\}\(DELETE\)\{0,1\}[ ]ON[ ][\`][A-Za-z0-9_]*[\`][.]/AFTER \1\2\3 ON /'
+            | grep -v 'mysqldump: Couldn.t find table' | grep -v 'mysqldump: Couldn.t execute' | grep -v 'Warning: Using a password'
+            | ${BIN_MYSQL} -h${DB_HOST} -u${DB_USER} --password=\"${DB_PASSWORD}\" --force $DB_NAME";
     fi
 
-    # Don't be confused by double gunzip in following command. Some poorly
-    # configured web servers can gzip everything including gzip files
-    CMD="${CMD} | gunzip -cf | sed -e 's/DEFINER[ ]*=[ ]*[^*]*\*/\*/'
-        | sed -e 's/TRIGGER[ ][\`][A-Za-z0-9_]*[\`][.]/TRIGGER /'
-        | sed -e 's/AFTER[ ]\(INSERT\)\{0,1\}\(UPDATE\)\{0,1\}\(DELETE\)\{0,1\}[ ]ON[ ][\`][A-Za-z0-9_]*[\`][.]/AFTER \1\2\3 ON /'
-        | grep -v 'mysqldump: Couldn.t find table' | grep -v 'mysqldump: Couldn.t execute' | grep -v 'Warning: Using a password'
-        | ${BIN_MYSQL} -h${DB_HOST} -u${DB_USER} --password=\"${DB_PASSWORD}\" --force $DB_NAME";
     runCommand
 
     validateDatabaseDumpDataExists
