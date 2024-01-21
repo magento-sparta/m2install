@@ -2229,9 +2229,13 @@ function warmCache()
   local currentUser="$(whoami)"
   local dir="$(pwd)"
   local currentScript="$BASH_SOURCE"
+  local codebaseSize='\N'
+  local databaseSize='\N'
   if foundSupportBackupFiles
   then
     mode=restore
+    codebaseSize="$(stat --printf='%s' ${EXTRACT_FILENAME})"
+    databaseSize="$(stat --printf='%s' $(getDbDumpFilename))"
   fi
 
   END_TIME=$(date +%s)
@@ -2239,7 +2243,7 @@ function warmCache()
   printString "Cache warm up ${home_url}. Response code: $home_response_code"
   printString "Cache warm up ${admin_url}. Response code: $admin_response_code"
   printString "$(basename "$0") took $SUMMARY_TIME minutes to complete install/deploy process"
-  writeCsvMetricRow "$(date '+%Y-%m-%d %H:%M:%S'), $mode, $home_response_code, $home_url, $admin_response_code, $admin_url, $SUMMARY_TIME, $currentUser, $dir, $currentScript, \"$GLOBAL_ARGS\""
+  writeCsvMetricRow "$(date '+%Y-%m-%d %H:%M:%S'), $mode, $home_response_code, $home_url, $admin_response_code, $admin_url, $SUMMARY_TIME, $currentUser, $dir, $currentScript, \"$GLOBAL_ARGS\", $codebaseSize, $databaseSize"
 }
 
 function afterInstall()
