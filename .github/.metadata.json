@@ -1,8 +1,8 @@
 {
     "templateVersion": "0.2",
     "product": {
-        "name": "GDPR Helper",
-        "description": "The tool that helps to remove sensetive data per GDPR policy",
+        "name": "Magento 2 Bash Install/Restore Script",
+        "description": "Script simplifies  the installation process of Magento 2 and rapid deployment of merchant code and DB dumps",
     },
     "contacts": {
         "team": {
