@@ -2820,6 +2820,31 @@ function testParseMagentoVersion()
   assertEqual "2.2.4-p10" "$result"
 }
 
+validateWorkDirectory() {
+  # Exit if the script runs inside a home directory
+  if [[ ${PWD} == ${HOME} ]]; then
+    echo "The script cannot be executed in home directory"
+    echo "Please create a subdirectory and run script from there"
+    exit 1
+  fi
+
+  # Sparta specific checks
+  if [[ ${HOSTNAME} =~ sparta.ceng.magento.com$ ]]; then
+    # Exit if the script runs outside of public_html directory
+    if [[ ! ${PWD} =~ ^${HOME}/public_html* ]]; then
+      echo "The script cannot be executed outside of public_html directory"
+      echo "Please create a subdirectory in ${HOME}/public_html and run script from there"
+      exit 1
+    fi
+
+    # Exit if the script runs inside public_html directory without a subfolder
+    if [[ ${PWD} == ${HOME}/public_html ]]; then
+      echo "The script cannot be executed in public_html directory"
+      echo "Please create a subdirectory and run script from there"
+      exit 1
+    fi
+  fi
+}
 
 ################################################################################
 # Main
@@ -2840,6 +2865,7 @@ function main()
     processOptions "$@"
     initQuietMode
     printString Current Directory: "$(pwd)"
+    validateWorkDirectory
     printString "Configuration loaded from: $(getConfigFiles)"
     checkDependencies
     showWizard
