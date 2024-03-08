@@ -1786,6 +1786,9 @@ function runComposerInstall()
 
 function installMagento()
 {
+    local searchEngine
+    local searchEngineBase
+
     if [ "${SOURCE}" == 'git' ]
     then
         CMD="${BIN_PHP} ${BIN_COMPOSER} config repositories.magento composer https://repo.magento.com/"
@@ -1830,8 +1833,9 @@ function installMagento()
     fi
     if isElasticSearchRequired && isElasticSearchConfigIsAvailable
     then
-	    local searchEngine="$(getRecommendedSearchEngineForVersion)"
-	    CMD="${CMD} --search-engine=$searchEngine --elasticsearch-host=$(getESConfigHost $searchEngine) --elasticsearch-port=$(getESConfigPort $searchEngine) --elasticsearch-index-prefix=${DB_NAME}"
+      searchEngine="$(getRecommendedSearchEngineForVersion)"
+      searchEngineBase="${searchEngine%[[:digit:]]}"
+      CMD="${CMD} --search-engine=$searchEngine --${searchEngineBase}-host=$(getESConfigHost $searchEngine) --${searchEngineBase}-port=$(getESConfigPort $searchEngine) --${searchEngineBase}-index-prefix=${DB_NAME}"
     fi
     runCommand
 }
@@ -1871,7 +1875,8 @@ function getRecommendedSearchEngineForVersion()
     versionIsHigherThan "$(getMagentoVersion)" "2.3.0" && searchEngine="elasticsearch"
     versionIsHigherThan "$(getMagentoVersion)" "2.3.1" && searchEngine="elasticsearch5"
     versionIsHigherThan "$(getMagentoVersion)" "2.3.5" && searchEngine="elasticsearch7"
-    checkIfBasedOnDevelopBranch && searchEngine="elasticsearch7"
+    versionIsHigherThan "$(getMagentoVersion)" "2.4.6" && searchEngine="opensearch"
+    checkIfBasedOnDevelopBranch && searchEngine="opensearch"
     echo "$searchEngine"
     return 0
 }
@@ -1880,9 +1885,28 @@ function parseElasticSearchVersion()
 {
   local eshost=$1
   local esport=$2
-  local elasticSearchVersion=$(curl -s -X GET "$eshost:$esport" | grep number | sed 's/[^0-9.]//g' | head -c 1)
-  [[ "$elasticSearchVersion" ]] && [[ "$elasticSearchVersion" -gt 1 ]] && { echo "elasticsearch${elasticSearchVersion}"; return 0; }
-  return 255
+  local elasticSearchDistribution
+  local elasticSearchVersion
+
+  elasticSearchDistribution=$(curl -s "${eshost}:${esport}" | php -r 'print_r(json_decode(stream_get_contents(STDIN), true)["version"]["distribution"]);')
+  elasticSearchVersion=$(curl -s "${eshost}:${esport}" | php -r 'print_r(json_decode(stream_get_contents(STDIN), true)["version"]["number"]);')
+
+  case "${elasticSearchDistribution}" in
+    ''|elasticsearch)
+      if [[ -n ${elasticSearchVersion} ]]; then
+        echo "elasticsearch${elasticSearchVersion%%.*}"
+      else
+        return 255
+      fi
+      ;;
+    opensearch)
+      echo "opensearch"
+      ;;
+    *)
+      return 255
+      ;;
+  esac
+  return 0
 }
 
 function getESConfigHost()
@@ -1890,24 +1914,19 @@ function getESConfigHost()
   [[ "$ELASTICSEARCH_HOST" ]] && { echo "$ELASTICSEARCH_HOST"; return 0; }
   case "$1" in
     elasticsearch7)
-      echo "$SEARCH_ENGINE_ELASTICSEARCH7_HOST"
-      return 0
-      ;;
+      echo "$SEARCH_ENGINE_ELASTICSEARCH7_HOST";;
     elasticsearch6)
-      echo "$SEARCH_ENGINE_ELASTICSEARCH6_HOST"
-      return 0
-      ;;
+      echo "$SEARCH_ENGINE_ELASTICSEARCH6_HOST";;
     elasticsearch5)
-      echo "$SEARCH_ENGINE_ELASTICSEARCH5_HOST"
-      return 0
-      ;;
+      echo "$SEARCH_ENGINE_ELASTICSEARCH5_HOST";;
     elasticsearch)
-      echo "$SEARCH_ENGINE_ELASTICSEARCH2_HOST"
-      return 0
-      ;;
+      echo "$SEARCH_ENGINE_ELASTICSEARCH2_HOST";;
+    opensearch)
+      echo "$SEARCH_ENGINE_OPENSEARCH_HOST";;
+    *)
+      return 255;;
   esac
-
-  return 255
+  return 0
 }
 
 function getESConfigPort()
@@ -1915,22 +1934,19 @@ function getESConfigPort()
   [[ "$ELASTICSEARCH_PORT" ]] && { echo "$ELASTICSEARCH_PORT"; return 0; }
   case "$1" in
     elasticsearch7)
-      echo "$SEARCH_ENGINE_ELASTICSEARCH7_PORT"
-      return 0
-      ;;
+      echo "$SEARCH_ENGINE_ELASTICSEARCH7_PORT";;
     elasticsearch6)
-      echo "$SEARCH_ENGINE_ELASTICSEARCH6_PORT"
-      return 0
-      ;;
+      echo "$SEARCH_ENGINE_ELASTICSEARCH6_PORT";;
     elasticsearch5)
-      echo "$SEARCH_ENGINE_ELASTICSEARCH5_PORT"
-      return 0
-      ;;
+      echo "$SEARCH_ENGINE_ELASTICSEARCH5_PORT";;
     elasticsearch)
-      echo "$SEARCH_ENGINE_ELASTICSEARCH2_PORT"
-      return 0
-      ;;
+      echo "$SEARCH_ENGINE_ELASTICSEARCH2_PORT";;
+    opensearch)
+      echo "$SEARCH_ENGINE_OPENSEARCH_PORT";;
+    *)
+      return 255;;
   esac
+  return 0
 }
 
 function getMagentoVersion()
