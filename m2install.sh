@@ -1906,24 +1906,19 @@ function getESConfigHost()
   [[ "$ELASTICSEARCH_HOST" ]] && { echo "$ELASTICSEARCH_HOST"; return 0; }
   case "$1" in
     elasticsearch7)
-      echo "$SEARCH_ENGINE_ELASTICSEARCH7_HOST"
-      return 0
-      ;;
+      echo "$SEARCH_ENGINE_ELASTICSEARCH7_HOST";;
     elasticsearch6)
-      echo "$SEARCH_ENGINE_ELASTICSEARCH6_HOST"
-      return 0
-      ;;
+      echo "$SEARCH_ENGINE_ELASTICSEARCH6_HOST";;
     elasticsearch5)
-      echo "$SEARCH_ENGINE_ELASTICSEARCH5_HOST"
-      return 0
-      ;;
+      echo "$SEARCH_ENGINE_ELASTICSEARCH5_HOST";;
     elasticsearch)
-      echo "$SEARCH_ENGINE_ELASTICSEARCH2_HOST"
-      return 0
-      ;;
+      echo "$SEARCH_ENGINE_ELASTICSEARCH2_HOST";;
+    opensearch)
+      echo "$SEARCH_ENGINE_OPENSEARCH_HOST";;
+    *)
+      return 255;;
   esac
-
-  return 255
+  return 0
 }
 
 function getESConfigPort()
@@ -1931,22 +1926,19 @@ function getESConfigPort()
   [[ "$ELASTICSEARCH_PORT" ]] && { echo "$ELASTICSEARCH_PORT"; return 0; }
   case "$1" in
     elasticsearch7)
-      echo "$SEARCH_ENGINE_ELASTICSEARCH7_PORT"
-      return 0
-      ;;
+      echo "$SEARCH_ENGINE_ELASTICSEARCH7_PORT";;
     elasticsearch6)
-      echo "$SEARCH_ENGINE_ELASTICSEARCH6_PORT"
-      return 0
-      ;;
+      echo "$SEARCH_ENGINE_ELASTICSEARCH6_PORT";;
     elasticsearch5)
-      echo "$SEARCH_ENGINE_ELASTICSEARCH5_PORT"
-      return 0
-      ;;
+      echo "$SEARCH_ENGINE_ELASTICSEARCH5_PORT";;
     elasticsearch)
-      echo "$SEARCH_ENGINE_ELASTICSEARCH2_PORT"
-      return 0
-      ;;
+      echo "$SEARCH_ENGINE_ELASTICSEARCH2_PORT";;
+    opensearch)
+      echo "$SEARCH_ENGINE_OPENSEARCH_PORT";;
+    *)
+      return 255;;
   esac
+  return 0
 }
 
 function getMagentoVersion()
