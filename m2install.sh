@@ -1871,7 +1871,8 @@ function getRecommendedSearchEngineForVersion()
     versionIsHigherThan "$(getMagentoVersion)" "2.3.0" && searchEngine="elasticsearch"
     versionIsHigherThan "$(getMagentoVersion)" "2.3.1" && searchEngine="elasticsearch5"
     versionIsHigherThan "$(getMagentoVersion)" "2.3.5" && searchEngine="elasticsearch7"
-    checkIfBasedOnDevelopBranch && searchEngine="elasticsearch7"
+    versionIsHigherThan "$(getMagentoVersion)" "2.4.2" && searchEngine="opensearch"
+    checkIfBasedOnDevelopBranch && searchEngine="opensearch"
     echo "$searchEngine"
     return 0
 }
