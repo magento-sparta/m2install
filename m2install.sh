@@ -1881,9 +1881,24 @@ function parseElasticSearchVersion()
 {
   local eshost=$1
   local esport=$2
-  local elasticSearchVersion=$(curl -s -X GET "$eshost:$esport" | grep number | sed 's/[^0-9.]//g' | head -c 1)
-  [[ "$elasticSearchVersion" ]] && [[ "$elasticSearchVersion" -gt 1 ]] && { echo "elasticsearch${elasticSearchVersion}"; return 0; }
-  return 255
+  local elasticSearchDistribution
+  local elasticSearchVersion
+
+  elasticSearchDistribution=$(curl -s "${eshost}:${esport}" | php -r 'print_r(json_decode(stream_get_contents(STDIN), true)["version"]["distribution"]);')
+  elasticSearchVersion=$(curl -s "${eshost}:${esport}" | php -r 'print_r(json_decode(stream_get_contents(STDIN), true)["version"]["version"]);')
+
+  case "${elasticSearchDistribution}" in
+    elasticsearch)
+      echo "elasticsearch${elasticSearchVersion}"
+      ;;
+    opensearch)
+      echo "opensearch"
+      ;;
+    *)
+      return 255
+      ;;
+  esac
+  return 0
 }
 
 function getESConfigHost()
