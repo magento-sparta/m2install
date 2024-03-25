@@ -1837,7 +1837,14 @@ function installMagento()
       searchEngineBase="${searchEngine%[[:digit:]]}"
       CMD="${CMD} --search-engine=$searchEngine --${searchEngineBase}-host=$(getESConfigHost $searchEngine) --${searchEngineBase}-port=$(getESConfigPort $searchEngine) --${searchEngineBase}-index-prefix=${DB_NAME}"
     fi
-    runCommand
+
+    echo "${CMD}"
+    ${CMD}
+    if (( $? != 0 )); then
+      echo "bin/magento setup:install failed"
+      exit 1
+    fi
+
 }
 
 function isElasticSearchRequired()
