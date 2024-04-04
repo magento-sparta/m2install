@@ -807,7 +807,7 @@ function restore_db()
 
     if [[ "${_DB_FILENAME}" =~ "db_mydumper.sql.gz" ]]; then
         hash myloader &>/dev/null || printError "'myloader' is not found on this system" || exit 1
-        CMD="gunzip -cf ${_DB_FILENAME} | myloader --host ${DB_HOST} --user ${DB_USER} --password ${DB_PASSWORD} --database ${DB_NAME} --overwrite-tables --verbose 1 --stream"
+        CMD="gunzip -cf ${_DB_FILENAME} | myloader --host ${DB_HOST} --user ${DB_USER} --password=\"${DB_PASSWORD}\" --database ${DB_NAME} --overwrite-tables --verbose 1 --stream"
     else
         CMD="gunzip -cf ${_DB_FILENAME}"
         if which pv > /dev/null
