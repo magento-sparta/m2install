@@ -2542,7 +2542,7 @@ function cleanupCurrentDirectory()
       runCommand
     elif askConfirmation "Do you want to keep dump files, ex: php*.code.tar.gz ? (y/N)";
     then
-      CMD="ls -I 'php*.*.*gz' -A | xargs rm -rf"
+      CMD="ls -I 'php*.*.*gz' -A | grep -v db_mydumper.sql.gz | xargs rm -rf"
       runCommand
     else
       CMD="$removeAll"
