@@ -1740,7 +1740,11 @@ function getB2Bversion()
     MAGENTO_MAJOR_VERSION=`echo "${REAL_MAGENTO_VERSION}" | sed 's/.*2\.\([0-9]*\)\.\([0-9]*\).*/\1/'`
     MAGENTO_MINOR_VERSION=`echo "${REAL_MAGENTO_VERSION}" | sed 's/.*2\.\([0-9]*\)\.\([0-9]*\).*/\2/'`
     MAGENTO_PATCH_VERSION=`echo "${REAL_MAGENTO_VERSION}" | sed 's/.*2\.\([0-9]*\)\.\([0-9]*\).\([a-z0-9]*\)/\3/'`
-    if [ $MAGENTO_MAJOR_VERSION -ge 4 ] && [ $MAGENTO_MINOR_VERSION -ge 1 ]
+    if [ $MAGENTO_MAJOR_VERSION -eq 4 ] && [ $MAGENTO_MINOR_VERSION -eq 7 ]
+    then
+        B2B_VERSION_MAJOR='4'
+        B2B_VERSION_MINOR='2'
+    elif [ $MAGENTO_MAJOR_VERSION -ge 4 ] && [ $MAGENTO_MINOR_VERSION -ge 1 ]
     then
         B2B_VERSION_MAJOR=$(( `echo "${MAGENTO_MAJOR_VERSION}"` -1 ))
         B2B_VERSION_MINOR=$(( `echo "${MAGENTO_MINOR_VERSION}"` -1 ))
