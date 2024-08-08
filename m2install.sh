@@ -1024,6 +1024,23 @@ index 1f454518e43..b3dcc784917 100644
      const EXPIRE_NOW_TIME = 1;
      const EXPIRE_AT_END_OF_SESSION_TIME = 0;
 EOF
+  # Fix CSP issue
+  # https://wiki.corp.adobe.com/pages/viewpage.action?pageId=2998017599
+  patch -p1 <<'EOF'
+diff --git a/vendor/magento/module-csp/Model/Policy/Renderer/SimplePolicyHeaderRenderer.php b/vendor/magento/module-csp/Model/Policy/Renderer/SimplePolicyHeaderRenderer.php
+index d419c25..eab39a4 100644
+--- a/vendor/magento/module-csp/Model/Policy/Renderer/SimplePolicyHeaderRenderer.php
++++ b/vendor/magento/module-csp/Model/Policy/Renderer/SimplePolicyHeaderRenderer.php
+@@ -60,7 +60,7 @@ class SimplePolicyHeaderRenderer implements PolicyRendererInterface
+         if ($existing = $response->getHeader($header)) {
+             $value = $value .' ' .$existing->getFieldValue();
+         }
+-        $response->setHeader($header, $value, true);
++        //$response->setHeader($header, $value, true);
+     }
+
+     /**
+EOF
 }
 
 function appConfigImport()
