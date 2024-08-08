@@ -1041,6 +1041,23 @@ index d419c25..eab39a4 100644
 
      /**
 EOF
+  # Fix "Undefined array key 'frontend'" error
+  # https://wiki.corp.adobe.com/pages/viewpage.action?pageId=2820824435
+  patch -p1 <<'EOF'
+diff --git a/vendor/magento/framework/App/Cache/Frontend/Pool.php b/vendor/magento/framework/App/Cache/Frontend/Pool.php
+index 6571ba7..0551b9f 100644
+--- a/vendor/magento/framework/App/Cache/Frontend/Pool.php
++++ b/vendor/magento/framework/App/Cache/Frontend/Pool.php
+@@ -86,7 +86,7 @@ class Pool implements \Iterator
+          * default cache_dir setting from di.xml when a cache id_prefix is configured in app/etc/env.php.
+          */
+         $cacheInfo = $this->deploymentConfig->getConfigData(FrontendPool::KEY_CACHE);
+-        if (null !== $cacheInfo && array_key_exists(FrontendPool::KEY_FRONTEND_CACHE, $cacheInfo)) {
++       if (null !== $cacheInfo && isset($cacheInfo[FrontendPool::KEY_FRONTEND_CACHE])) {
+             return array_replace_recursive($this->_frontendSettings, $cacheInfo[FrontendPool::KEY_FRONTEND_CACHE]);
+         }
+         return $this->_frontendSettings;
+EOF
 }
 
 function appConfigImport()
