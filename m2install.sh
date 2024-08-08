@@ -986,6 +986,7 @@ function patchRemote()
 
 function patchDumps()
 {
+  # Fix issue with order grid in admin backend
   patch -p1 <<'EOF'
 diff --git a/vendor/magento/module-backend/Block/Dashboard/Orders/Grid.php b/vendor/magento/module-backend/Block/Dashboard/Orders/Grid.php
 index 5027978..9df3c24 100644
@@ -1003,6 +1004,25 @@ index 5027978..9df3c24 100644
              $item->getCustomer() ?: $item->setCustomer($item->getBillingAddress()->getName());
          }
          return $this;
+EOF
+  # Fix issue with large amount of cookies
+  # https://wiki.corp.adobe.com/pages/viewpage.action?pageId=2820824430
+  # https://experienceleague.adobe.com/en/docs/commerce-knowledge-base/kb/support-tools/patches/v1-0-12/mdva-12304-magento-patch-503-error-on-store-front-and-cookie-error
+  patch -p1 <<'EOF'
+diff -Nuar a/vendor/magento/framework/Stdlib/Cookie/PhpCookieManager.php b/vendor/magento/framework/Stdlib/Cookie/PhpCookieManager.php
+index 1f454518e43..b3dcc784917 100644
+--- a/vendor/magento/framework/Stdlib/Cookie/PhpCookieManager.php
++++ b/vendor/magento/framework/Stdlib/Cookie/PhpCookieManager.php
+@@ -29,7 +29,7 @@ class PhpCookieManager implements CookieManagerInterface
+      * RFC 2109 - Page 15
+      * http://www.ietf.org/rfc/rfc6265.txt
+      */
+-    const MAX_NUM_COOKIES = 50;
+-    const MAX_COOKIE_SIZE = 4096;
++    const MAX_NUM_COOKIES = 500;
++    const MAX_COOKIE_SIZE = 40960;
+     const EXPIRE_NOW_TIME = 1;
+     const EXPIRE_AT_END_OF_SESSION_TIME = 0;
 EOF
 }
 
