@@ -1221,6 +1221,9 @@ function configure_db()
   removeConfigByKeyword
   resetAdminPassword
   switchSearchEngineToDefaultEngine
+
+  ${BIN_PHP} ${BIN_MAGE} config:set 'system/security/max_session_size_admin' '0'
+  ${BIN_PHP} ${BIN_MAGE} config:set 'system/security/max_session_size_storefront' '0'
 }
 
 function setConfig()
