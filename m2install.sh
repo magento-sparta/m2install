@@ -1179,7 +1179,6 @@ function configure_db()
   setConfig 'web/secure/base_url' "${BASE_URL}";
   setConfig 'web/unsecure/base_url' "${BASE_URL}";
   setConfig 'web/secure/offloader_header' 'X-Forwarded-Proto';
-  setConfig 'web/seo/use_rewrites' '1';
   setConfig 'google/analytics/active' '0';
   setConfig 'google/adwords/active' '0';
   setConfig 'msp_securitysuite_twofactorauth/general/enabled' '0';
@@ -1222,6 +1221,7 @@ function configure_db()
   resetAdminPassword
   switchSearchEngineToDefaultEngine
 
+  ${BIN_PHP} ${BIN_MAGE} config:set 'web/seo/use_rewrites' '1'
   ${BIN_PHP} ${BIN_MAGE} config:set 'system/security/max_session_size_admin' '0'
   ${BIN_PHP} ${BIN_MAGE} config:set 'system/security/max_session_size_storefront' '0'
 }
