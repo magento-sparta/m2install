@@ -1222,8 +1222,8 @@ function configure_db()
   switchSearchEngineToDefaultEngine
 
   ${BIN_PHP} ${BIN_MAGE} config:set 'web/seo/use_rewrites' '1'
-  ${BIN_PHP} ${BIN_MAGE} config:set 'system/security/max_session_size_admin' '0'
-  ${BIN_PHP} ${BIN_MAGE} config:set 'system/security/max_session_size_storefront' '0'
+  ${BIN_PHP} ${BIN_MAGE} config:set 'system/security/max_session_size_admin' '2048000'
+  ${BIN_PHP} ${BIN_MAGE} config:set 'system/security/max_session_size_storefront' '2048000'
 }
 
 function setConfig()
