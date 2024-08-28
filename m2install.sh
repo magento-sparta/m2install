@@ -996,8 +996,8 @@ index 5027978..9df3c24 100644
      protected function _afterLoadCollection()
      {
          foreach ($this->getCollection() as $item) {
-+            // patched by m2install.
-+            // To revert patch remove next lines from 95 to 99
++            // patched by m2install
++            // To revert the patch remove the next 3 lines
 +            if (is_null($item->getBillingAddress())) {
 +                return $this;
 +            }
@@ -1013,12 +1013,15 @@ diff -Nuar a/vendor/magento/framework/Stdlib/Cookie/PhpCookieManager.php b/vendo
 index 1f454518e43..b3dcc784917 100644
 --- a/vendor/magento/framework/Stdlib/Cookie/PhpCookieManager.php
 +++ b/vendor/magento/framework/Stdlib/Cookie/PhpCookieManager.php
-@@ -29,7 +29,7 @@ class PhpCookieManager implements CookieManagerInterface
+@@ -29,7 +29,10 @@ class PhpCookieManager implements CookieManagerInterface
       * RFC 2109 - Page 15
       * http://www.ietf.org/rfc/rfc6265.txt
       */
 -    const MAX_NUM_COOKIES = 50;
 -    const MAX_COOKIE_SIZE = 4096;
++    // patched by m2install
++    //const MAX_NUM_COOKIES = 50;
++    //const MAX_COOKIE_SIZE = 4096;
 +    const MAX_NUM_COOKIES = 500;
 +    const MAX_COOKIE_SIZE = 40960;
      const EXPIRE_NOW_TIME = 1;
@@ -1031,11 +1034,12 @@ diff --git a/vendor/magento/module-csp/Model/Policy/Renderer/SimplePolicyHeaderR
 index d419c25..eab39a4 100644
 --- a/vendor/magento/module-csp/Model/Policy/Renderer/SimplePolicyHeaderRenderer.php
 +++ b/vendor/magento/module-csp/Model/Policy/Renderer/SimplePolicyHeaderRenderer.php
-@@ -60,7 +60,7 @@ class SimplePolicyHeaderRenderer implements PolicyRendererInterface
+@@ -60,7 +60,8 @@ class SimplePolicyHeaderRenderer implements PolicyRendererInterface
          if ($existing = $response->getHeader($header)) {
              $value = $value .' ' .$existing->getFieldValue();
          }
 -        $response->setHeader($header, $value, true);
++        // patched by m2install
 +        //$response->setHeader($header, $value, true);
      }
 
@@ -1048,12 +1052,14 @@ diff --git a/vendor/magento/framework/App/Cache/Frontend/Pool.php b/vendor/magen
 index 6571ba7..0551b9f 100644
 --- a/vendor/magento/framework/App/Cache/Frontend/Pool.php
 +++ b/vendor/magento/framework/App/Cache/Frontend/Pool.php
-@@ -86,7 +86,7 @@ class Pool implements \Iterator
+@@ -86,7 +86,9 @@ class Pool implements \Iterator
           * default cache_dir setting from di.xml when a cache id_prefix is configured in app/etc/env.php.
           */
          $cacheInfo = $this->deploymentConfig->getConfigData(FrontendPool::KEY_CACHE);
 -        if (null !== $cacheInfo && array_key_exists(FrontendPool::KEY_FRONTEND_CACHE, $cacheInfo)) {
-+       if (null !== $cacheInfo && isset($cacheInfo[FrontendPool::KEY_FRONTEND_CACHE])) {
++        // patched by m2install
++        //if (null !== $cacheInfo && array_key_exists(FrontendPool::KEY_FRONTEND_CACHE, $cacheInfo)) {
++        if (null !== $cacheInfo && isset($cacheInfo[FrontendPool::KEY_FRONTEND_CACHE])) {
              return array_replace_recursive($this->_frontendSettings, $cacheInfo[FrontendPool::KEY_FRONTEND_CACHE]);
          }
          return $this->_frontendSettings;
