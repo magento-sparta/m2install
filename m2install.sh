@@ -2820,7 +2820,7 @@ function parseMagentoVersion()
   else
     valueToParse="$(${BIN_PHP} bin/magento -V)"
   fi
-  echo "$valueToParse" | grep -oEh "[0-9\.-]+p*[0-9]*" | head -n1
+  echo "$valueToParse" | grep -oEh "([0-9](\.)?){2,3}(-p[0-9]{1,2})?" | head -n1
 }
 
 
