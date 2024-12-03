@@ -1475,9 +1475,14 @@ function configurePWA()
         echo "PWA setup"
         PWA="$(cat pwa_path.txt)"
         PWA_CONFIG="echo -e '
-        SetEnv MAGENTO_BACKEND_URL ${BASE_URL} \n
-        SetEnv NODE_ENV production \n
-        SetEnv CONFIG__DEFAULT__WEB__UPWARD__PATH ${ABSOLUTE_PATH}/${PWA}/upward.yml \n
+        # Rewrite rules for PWA JS files\n
+        RewriteCond %{REQUEST_URI} \.js$ [NC]\n
+        RewriteCond %{DOCUMENT_ROOT}/${PWA}/%{REQUEST_URI} -f\n
+        RewriteRule ^(.*\.js)$ /${PWA}/\$1 [L]\n
+        # Set environment variables required for PWA\n
+        SetEnv MAGENTO_BACKEND_URL ${BASE_URL}\n
+        SetEnv NODE_ENV production\n
+        SetEnv CONFIG__DEFAULT__WEB__UPWARD__PATH ${ABSOLUTE_PATH}/${PWA}/upward.yml\n
         '"
         CMD="${PWA_CONFIG} >> .htaccess "
         runCommand
