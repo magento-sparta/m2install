@@ -1479,6 +1479,8 @@ function configurePWA()
         RewriteCond %{REQUEST_URI} \.(js|svg|woff|gif|woff2|png)$ [NC]\n
         RewriteCond %{DOCUMENT_ROOT}/${PWA}/%{REQUEST_URI} -f\n
         RewriteRule ^(.*\.(js|svg|woff|gif|woff2|png))$ /${PWA}/\$1 [L]\n
+        # Rewrite rule for redirecting requests to application webroot directory
+        RewriteRule .* /pub/$0 [L]
         # Set environment variables required for PWA\n
         SetEnv MAGENTO_BACKEND_URL ${BASE_URL}\n
         SetEnv NODE_ENV production\n
