@@ -1476,9 +1476,9 @@ function configurePWA()
         PWA="$(cat pwa_path.txt)"
         PWA_CONFIG="echo -e '
         # Rewrite rules for PWA JS files\n
-        RewriteCond %{REQUEST_URI} \.js$ [NC]\n
+        RewriteCond %{REQUEST_URI} \.(js|svg|woff|gif|woff2|png)$ [NC]\n
         RewriteCond %{DOCUMENT_ROOT}/${PWA}/%{REQUEST_URI} -f\n
-        RewriteRule ^(.*\.js)$ /${PWA}/\$1 [L]\n
+        RewriteRule ^(.*\.(js|svg|woff|gif|woff2|png))$ /${PWA}/\$1 [L]\n
         # Set environment variables required for PWA\n
         SetEnv MAGENTO_BACKEND_URL ${BASE_URL}\n
         SetEnv NODE_ENV production\n
