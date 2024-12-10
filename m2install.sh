@@ -356,8 +356,7 @@ function prepareBaseURL()
 
     BASE_URL="${HTTP_HOST}${BASE_PATH}/"
     BASE_URL=$(echo ${BASE_URL} | sed "s/\/\/$/\//g" )
-    if isPubRequired
-    then
+    if [[ isPubRequired && ! -f pwa_path.txt ]]; then
         BASE_URL="${BASE_URL}pub/"
     fi
     BASE_URL=$(echo "$BASE_URL" | sed "s/\/\/$/\//g" );
