@@ -1805,28 +1805,90 @@ endmessage
 
 function getB2Bversion()
 {
-    checkIfBasedOnDevelopBranch && { B2B_VERSION="develop"; return 0; }
-    REAL_MAGENTO_VERSION=`${BIN_PHP} bin/magento --version`
-    MAGENTO_MAJOR_VERSION=`echo "${REAL_MAGENTO_VERSION}" | sed 's/.*2\.\([0-9]*\)\.\([0-9]*\).*/\1/'`
-    MAGENTO_MINOR_VERSION=`echo "${REAL_MAGENTO_VERSION}" | sed 's/.*2\.\([0-9]*\)\.\([0-9]*\).*/\2/'`
-    MAGENTO_PATCH_VERSION=`echo "${REAL_MAGENTO_VERSION}" | sed 's/.*2\.\([0-9]*\)\.\([0-9]*\).\([a-z0-9]*\)/\3/'`
-    if [ $MAGENTO_MAJOR_VERSION -eq 4 ] && [ $MAGENTO_MINOR_VERSION -eq 7 ]
-    then
-        B2B_VERSION_MAJOR='4'
-        B2B_VERSION_MINOR='2'
-    elif [ $MAGENTO_MAJOR_VERSION -ge 4 ] && [ $MAGENTO_MINOR_VERSION -ge 1 ]
-    then
-        B2B_VERSION_MAJOR=$(( `echo "${MAGENTO_MAJOR_VERSION}"` -1 ))
-        B2B_VERSION_MINOR=$(( `echo "${MAGENTO_MINOR_VERSION}"` -1 ))
+    # Magento and B2B versions compatibility:
+    # https://wiki.corp.adobe.com/display/CENG/Table+of+Magento+Releases
+    # https://experienceleague.adobe.com/docs/commerce-operations/release/product-availability.html
+    local -A magento_b2b_map=(
+        ["2.4.7-p4"]="1.5.1"
+        ["2.4.7-p3"]="1.5.0"
+        ["2.4.7-p2"]="1.4.2-p2"
+        ["2.4.7-p1"]="1.4.2-p1"
+        ["2.4.7"]="1.4.2"
+        ["2.4.6-p9"]="1.5.1"
+        ["2.4.6-p8"]="1.5.0"
+        ["2.4.6-p7"]="1.3.5-p7"
+        ["2.4.6-p6"]="1.3.5-p6"
+        ["2.4.6-p5"]="1.3.5-p5"
+        ["2.4.6-p4"]="1.3.5-p4"
+        ["2.4.6-p3"]="1.3.5-p3"
+        ["2.4.6-p2"]="1.3.5-p2"
+        ["2.4.6-p1"]="1.3.5-p1"
+        ["2.4.6"]="1.3.5"
+        ["2.4.5-p10"]="1.3.4-p10"
+        ["2.4.5-p9"]="1.3.4-p9"
+        ["2.4.5-p8"]="1.3.4-p8"
+        ["2.4.5-p7"]="1.3.4-p7"
+        ["2.4.5-p6"]="1.3.4-p6"
+        ["2.4.5-p5"]="1.3.4-p5"
+        ["2.4.5-p4"]="1.3.4-p4"
+        ["2.4.5-p3"]="1.3.4-p3"
+        ["2.4.5-p2"]="1.3.4-p2"
+        ["2.4.5-p1"]="1.3.4-p1"
+        ["2.4.5"]="1.3.4"
+        ["2.4.4-p11"]="1.3.3-p11"
+        ["2.4.4-p10"]="1.3.3-p10"
+        ["2.4.4-p9"]="1.3.3-p9"
+        ["2.4.4-p8"]="1.3.3-p8"
+        ["2.4.4-p7"]="1.3.3-p7"
+        ["2.4.4-p6"]="1.3.3-p6"
+        ["2.4.4-p5"]="1.3.3-p5"
+        ["2.4.4-p4"]="1.3.3-p4"
+        ["2.4.4-p3"]="1.3.3-p3"
+        ["2.4.4-p2"]="1.3.3-p2"
+        ["2.4.4-p1"]="1.3.3-p1"
+        ["2.4.4"]="1.3.3"
+        ["2.4.3-p3"]="1.3.2-p3"
+        ["2.4.3-p2"]="1.3.2-p2"
+        ["2.4.3-p1"]="1.3.2-p1"
+        ["2.4.3"]="1.3.2"
+        ["2.4.2-p2"]="1.3.1-p2"
+        ["2.4.2-p1"]="1.3.1-p1"
+        ["2.4.2"]="1.3.1"
+        ["2.4.1-p1"]="1.3.0-p1"
+        ["2.4.1"]="1.3.0"
+        ["2.4.0-p1"]="1.2.0-p1"
+        ["2.4.0"]="1.2.0"
+        ["2.3.7-p4"]="1.1.7-p4"
+        ["2.3.7-p3"]="1.1.7-p3"
+        ["2.3.7-p2"]="1.1.7-p2"
+        ["2.3.7-p1"]="1.1.7-p1"
+        ["2.3.7"]="1.1.7"
+        ["2.3.6-p1"]="1.1.6-p1"
+        ["2.3.6"]="1.1.6"
+        ["2.3.5-p2"]="1.1.5-p2"
+        ["2.3.5-p1"]="1.1.5-p1"
+        ["2.3.5"]="1.1.5"
+        ["2.3.4-p2"]="1.1.4-p2"
+        ["2.3.4-p1"]="1.1.4-p1"
+        ["2.3.4"]="1.1.4"
+        ["2.3.3-p1"]="1.1.3-p1"
+        ["2.3.3"]="1.1.3"
+        ["2.3.2-p2"]="1.1.2-p2"
+        ["2.3.2"]="1.1.2"
+        ["2.3.1"]="1.1.1"
+        ["2.3.0"]="1.1.0"
+    )
+
+    if checkIfBasedOnDevelopBranch; then
+        B2B_VERSION="develop"
     else
-        B2B_VERSION_MAJOR=$(( `echo "${MAGENTO_MAJOR_VERSION}"` -2 ))
-        B2B_VERSION_MINOR=$MAGENTO_MINOR_VERSION
+        if [[ -n "${magento_b2b_map[$MAGENTO_VERSION]}" ]]; then
+            B2B_VERSION="${magento_b2b_map[$MAGENTO_VERSION]}"
+        else
+            echo "No B2B version found for Magento ${MAGENTO_VERSION}"
+            return 1
+        fi
     fi
-    if [ ! -z "$MAGENTO_PATCH_VERSION" ]
-    then
-        B2B_PATCH_VERSION="-${MAGENTO_PATCH_VERSION}"
-    fi
-    B2B_VERSION="1.${B2B_VERSION_MAJOR}.${B2B_VERSION_MINOR}${B2B_PATCH_VERSION}"
 }
 
 function linkEnterpriseEdition()
