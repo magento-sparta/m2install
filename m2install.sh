@@ -1063,6 +1063,22 @@ index 6571ba7..0551b9f 100644
          }
          return $this->_frontendSettings;
 EOF
+  # Fix paypal onboarding module empty domain
+  # https://experienceleague.adobe.com/en/docs/commerce-on-cloud/user-guide/configure-store/paypal#paypal-variables
+  patch -p1 <<'EOF'
+--- a/vendor/magento/module-paypal-on-boarding/etc/config.xml	2025-03-07 09:16:54
++++ b/vendor/magento/module-paypal-on-boarding/etc/config.xml	2025-03-07 15:29:30
+@@ -8,7 +8,7 @@
+ <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+     <default>
+         <paypal_onboarding>
+-            <middleman_domain></middleman_domain>
++            <middleman_domain>payment-broker.magento.com</middleman_domain>
+         </paypal_onboarding>
+     </default>
+ </config>
+
+EOF
 }
 
 function appConfigImport()
