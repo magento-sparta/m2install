@@ -1825,6 +1825,7 @@ function getB2Bversion()
     # https://wiki.corp.adobe.com/display/CENG/Table+of+Magento+Releases
     # https://experienceleague.adobe.com/docs/commerce-operations/release/product-availability.html
     local -A magento_b2b_map=(
+        ["2.4.8"]="1.5.2"
         ["2.4.7-p5"]="1.5.2"
         ["2.4.7-p4"]="1.5.1"
         ["2.4.7-p3"]="1.5.0"
