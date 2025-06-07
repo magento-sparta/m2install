@@ -1026,6 +1026,46 @@ index 1f454518e43..b3dcc784917 100644
      const EXPIRE_NOW_TIME = 1;
      const EXPIRE_AT_END_OF_SESSION_TIME = 0;
 EOF
+  # Fix issue with large amount of cookies for 2.4.4-p12, 2.4.5-p11, 2.4.6-p9, 2.4.7-p4
+  patch -p1 <<'EOF'
+diff --git a/vendor/magento/framework/Stdlib/Cookie/PhpCookieManager.php b/vendor/magento/framework/Stdlib/Cookie/PhpCookieManager.php
+index b8e4747f5fd5f..7b585e4bdc09d 100644
+--- a/vendor/magento/framework/Stdlib/Cookie/PhpCookieManager.php
++++ b/vendor/magento/framework/Stdlib/Cookie/PhpCookieManager.php
+@@ -31,7 +31,10 @@ class PhpCookieManager implements CookieManagerInterface
+      * RFC 2109 - Page 15
+      * http://www.ietf.org/rfc/rfc6265.txt
+      */
+-    private const MAX_NUM_COOKIES = 50;
+-    public const MAX_COOKIE_SIZE = 4096;
++    // patched by m2install
++    // private const MAX_NUM_COOKIES = 50;
++    // public const MAX_COOKIE_SIZE = 4096;
++    private const MAX_NUM_COOKIES = 500;
++    public const MAX_COOKIE_SIZE = 40960;
+     private const EXPIRE_NOW_TIME = 1;
+     private const EXPIRE_AT_END_OF_SESSION_TIME = 0;
+EOF
+  # Fix issue with large amount of cookies for 2.4.4-p13, 2.4.5-p12, 2.4.6-p10, 2.4.7-p5
+  patch -p1 <<'EOF'
+diff --git a/vendor/magento/framework/Stdlib/Cookie/PhpCookieManager.php b/vendor/magento/framework/Stdlib/Cookie/PhpCookieManager.php
+index b16cb3e801e..8ee11e881b2 100644
+--- a/vendor/magento/framework/Stdlib/Cookie/PhpCookieManager.php
++++ b/vendor/magento/framework/Stdlib/Cookie/PhpCookieManager.php
+@@ -40,7 +40,10 @@ class PhpCookieManager implements CookieManagerInterface
+      * RFC 2109 - Page 15
+      * http://www.ietf.org/rfc/rfc6265.txt
+      */
+-    public const MAX_NUM_COOKIES = 50;
+-    public const MAX_COOKIE_SIZE = 4096;
++    // patched by m2install
++    // public const MAX_NUM_COOKIES = 50;
++    // public const MAX_COOKIE_SIZE = 4096;
++    public const MAX_NUM_COOKIES = 500;
++    public const MAX_COOKIE_SIZE = 40960;
+     public const EXPIRE_NOW_TIME = 1;
+     public const EXPIRE_AT_END_OF_SESSION_TIME = 0;
+EOF
   # Fix CSP issue
   # https://wiki.corp.adobe.com/pages/viewpage.action?pageId=2998017599
   patch -p1 <<'EOF'
