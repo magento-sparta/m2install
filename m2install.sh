@@ -1066,6 +1066,26 @@ index b16cb3e801e..8ee11e881b2 100644
      public const EXPIRE_NOW_TIME = 1;
      public const EXPIRE_AT_END_OF_SESSION_TIME = 0;
 EOF
+  # Fix issue with large amount of cookies for 2.4.4-p14, 2.4.5-p13, 2.4.6-p11, 2.4.7-p6
+  patch -p1 <<'EOF'
+  diff --git a/vendor/magento/framework/Stdlib/Cookie/PhpCookieManager.php b/vendor/magento/framework/Stdlib/Cookie/PhpCookieManager.php
+  index 2738485f726d7..2295f03bb5b8e 100644
+  --- a/vendor/magento/framework/Stdlib/Cookie/PhpCookieManager.php
+  +++ b/vendor/magento/framework/Stdlib/Cookie/PhpCookieManager.php
+  @@ -31,7 +31,10 @@ class PhpCookieManager implements CookieManagerInterface
+        * RFC 2109 - Page 26
+        * http://www.ietf.org/rfc/rfc6265.txt
+        */
+  -    public const MAX_NUM_COOKIES = 50;
+  -    public const MAX_COOKIE_SIZE = 4096;
+  +    // patched by m2install
+  +    // public const MAX_NUM_COOKIES = 50;
+  +    // public const MAX_COOKIE_SIZE = 4096;
+  +    public const MAX_NUM_COOKIES = 500;
+  +    public const MAX_COOKIE_SIZE = 40960;
+       public const EXPIRE_NOW_TIME = 1;
+       public const EXPIRE_AT_END_OF_SESSION_TIME = 0;
+EOF
   # Fix CSP issue
   # https://wiki.corp.adobe.com/pages/viewpage.action?pageId=2998017599
   patch -p1 <<'EOF'
