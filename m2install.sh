@@ -2238,13 +2238,13 @@ function downloadSourceCode()
 function composerInstall()
 {
     if [ "$INSTALL_EE" ]; then
-        "${BIN_PHP}" "${BIN_COMPOSER}" create-project --repository-url='https://repo.magento.com/' magento/project-enterprise-edition ./ "${MAGENTO_VERSION}"
+        "${BIN_PHP}" "${BIN_COMPOSER}" create-project --no-security-blocking --repository-url='https://repo.magento.com/' magento/project-enterprise-edition ./ "${MAGENTO_VERSION}"
         if (( $? != 0 )); then
             echo "Failed to create a composer project"
             exit 1
         fi
     else
-        "${BIN_PHP}" "${BIN_COMPOSER}" create-project --repository-url='https://repo.magento.com/' magento/project-community-edition ./ "${MAGENTO_VERSION}"
+        "${BIN_PHP}" "${BIN_COMPOSER}" create-project --no-security-blocking --repository-url='https://repo.magento.com/' magento/project-community-edition ./ "${MAGENTO_VERSION}"
         if (( $? != 0 )); then
             echo "Failed to create a composer project"
             exit 1
