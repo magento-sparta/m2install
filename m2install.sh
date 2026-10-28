@@ -1299,12 +1299,63 @@ function configure_db()
   processShippingConfig
   processPaymentConfig
   removeConfigByKeyword
+  fixCustomerGridIssues
   resetAdminPassword
   switchSearchEngineToDefaultEngine
 
   ${BIN_PHP} ${BIN_MAGE} config:set 'web/seo/use_rewrites' '1'
   ${BIN_PHP} ${BIN_MAGE} config:set 'system/security/max_session_size_admin' '2048000'
   ${BIN_PHP} ${BIN_MAGE} config:set 'system/security/max_session_size_storefront' '2048000'
+}
+
+################################################################################
+# Description :
+#   Fixes the customer grid table generation issues that are specific to Mysql
+#   by preventing custom customer attribute from being searchable or filterable
+#   on the admin customer grid.
+#   - Fixes an issue where a TEXT-type customer attribute has no length when building the customer_grid table.
+#   - Fixes an issue where a FULLTEXT index has more than 12 key componenents.
+################################################################################
+function fixCustomerGridIssues()
+{
+  SQLQUERY="UPDATE ${DB_NAME}.$(getTablePrefix)customer_eav_attribute AS cea
+    INNER JOIN ${DB_NAME}.$(getTablePrefix)eav_attribute AS ea
+      ON ea.attribute_id = cea.attribute_id
+    INNER JOIN ${DB_NAME}.$(getTablePrefix)eav_entity_type AS eet
+      ON eet.entity_type_id = ea.entity_type_id
+    SET cea.is_searchable_in_grid = 0,
+        cea.is_filterable_in_grid = 0
+    WHERE eet.entity_type_code = 'customer'
+      AND ea.attribute_code NOT IN (
+        'website_id',
+        'store_id',
+        'created_in',
+        'prefix',
+        'firstname',
+        'middlename',
+        'lastname',
+        'suffix',
+        'email',
+        'group_id',
+        'dob',
+        'password_hash',
+        'rp_token',
+        'rp_token_created_at',
+        'default_billing',
+        'default_shipping',
+        'taxvat',
+        'confirmation',
+        'created_at',
+        'gender',
+        'disable_auto_group_change',
+        'updated_at',
+        'failures_num',
+        'first_failure',
+        'lock_expires',
+        'reward_update_notification',
+        'reward_warning_notification'
+      );"
+  mysqlQuery
 }
 
 function setConfig()
