@@ -1588,6 +1588,21 @@ function postOverwriteOriginalFiles()
     if [ -f app/etc/config.php ]
     then
         disableModuleInConfigFile 'smtp'
+        preventUnirgyModulesRegistration
+    fi
+}
+
+# Disable Unirgy registration to avoid setup:di:compile segmentation faults,
+# while retaining source files that other modules may depend on.
+function preventUnirgyModulesRegistration()
+{
+    disableModuleInConfigFile 'Unirgy_' || return
+
+    if [ -d app/code/Unirgy ]
+    then
+        printString "Removing Unirgy module registration files"
+        CMD="find app/code/Unirgy -type f -name registration.php -delete"
+        runCommand
     fi
 }
 
@@ -2617,10 +2632,11 @@ function disableModuleInConfigFile()
 
     if [ -f app/etc/config.php ]
     then
-        grep -iEo "['\"][a-z0-9]+_[a-z0-9]+['\"]\s*?=>\s*?1,?" app/etc/config.php | grep -iEo "['\"].*$modulePattern.*['\"]" | while read -r module ; do
-            echo "Module $module will be disabled in config.php"
-            CMD="sed -iE \"s/($module.*=>.*)[10]{1}/\\1 0/g\" app/etc/config.php"
-            runCommand
+        grep -iEo "['\"][a-z0-9]+_[a-z0-9_]+['\"][[:space:]]*=>[[:space:]]*1,?" app/etc/config.php | grep -iEo "['\"].*$modulePattern.*['\"]" | while read -r module ; do
+            printString "Module $module will be disabled in config.php"
+            local escapedModule=${module//\"/\\\"}
+            CMD="sed -E -i.bak \"s/($escapedModule[[:space:]]*=>[[:space:]]*)1/\\1 0/g\" app/etc/config.php"
+            runCommand || return
         done
     fi
 }
